@@ -1,0 +1,50 @@
+{
+  "name": "authority_validation_suite",
+  "version": "1.0.0",
+  "tests": [
+    {
+      "id": "identity_file_exists",
+      "type": "file_check",
+      "config": {
+        "path": "../authority/identity/owner.json"
+      },
+      "expect": "exists"
+    },
+    {
+      "id": "identity_has_signature_hash",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/identity/owner.json",
+        "field": "signature_hash"
+      },
+      "expect": "not_empty"
+    },
+    {
+      "id": "tax_rules_enforce_separation",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/tax/tax-rules.json",
+        "field": "rules.require_separation"
+      },
+      "expect": true
+    },
+    {
+      "id": "governance_has_emergency_stop",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/governance/governance-rules.json",
+        "field": "emergency_stop.enabled"
+      },
+      "expect": true
+    },
+    {
+      "id": "permissions_owner_can_issue_credit",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/permissions/permissions.json",
+        "field": "roles.owner.can_issue_credit"
+      },
+      "expect": true
+    }
+  ]
+}
