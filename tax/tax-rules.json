@@ -1,0 +1,14 @@
+{
+  "state": "Colorado",
+  "federal": "US",
+  "rules": {
+    "require_separation": true,
+    "order_of_operations": [
+      "federal",
+      "state",
+      "organization",
+      "individual"
+    ],
+    "documentation_required": true
+  }
+}
