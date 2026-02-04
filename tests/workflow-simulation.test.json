@@ -1,0 +1,8 @@
+{
+  "tests": [
+    {
+      "workflow": "issue_credit",
+      "expect": "kyc + tax_docs + ledger_sync required"
+    }
+  ]
+}
