@@ -1,0 +1,10 @@
+{
+  "roles": {
+    "owner": {
+      "can_issue_credit": true,
+      "can_modify_terms": true,
+      "can_disburse_funds": true,
+      "can_sync_ledger": true
+    }
+  }
+}
