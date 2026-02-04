@@ -1,0 +1,78 @@
+{
+  "name": "disburse_funds",
+  "version": "1.0.0",
+  "description": "Disburse funds only after approval, tax, and ledger sync are confirmed.",
+  "steps": [
+    {
+      "id": "check_emergency_stop",
+      "type": "governance_check",
+      "requires": [],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "emergency_stop"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "confirm_loan_approved",
+      "type": "ledger_check",
+      "requires": ["check_emergency_stop"],
+      "config": {
+        "source": "loaner-ledger",
+        "expected_entry_status": "approved"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "validate_tax_before_disbursement",
+      "type": "tax_check",
+      "requires": ["confirm_loan_approved"],
+      "config": {
+        "tax_rules_file": "../tax/tax-rules.json",
+        "require_separation": true,
+        "stage": "pre_disbursement"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "owner_disbursement_approval",
+      "type": "governance_check",
+      "requires": ["validate_tax_before_disbursement"],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "approval_thresholds.loan_disburse",
+        "required_role": "owner"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id":ance/governance-rules.json",
+        "field": "approval_thresholds.loan_disburse",
+        "required_role": "owner"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "execute_disbursement",
+      "type": "payment_instruction",
+      "requires": ["owner_disbursement_approval"],
+      "config": {
+        "target_system": "disbursement-engine",
+        "mode": "off_chain_instruction",
+        "record_instructions_only": true
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "update_ledger_to_disbursed",
+      "type": "ledger_write",
+      "requires": ["execute_disbursement"],
+      "config": {
+        "target": "loaner-ledger",
+        "entry_type": "loan",
+        "status": "disbursed"
+      },
+      "on_fail": "abort"
+    }
+  ]
+}
