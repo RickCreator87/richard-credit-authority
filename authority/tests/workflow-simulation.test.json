@@ -1,0 +1,84 @@
+{
+  "name": "workflow_simulation_suite",
+  "version": "1.0.0",
+  "tests": [
+    {
+      "workflow": "issue_credit",
+      "checks": [
+        {
+          "id": "order_enforced",
+          "type": "step_order",
+          "expect": [
+            "check_emergency_stop",
+            "validate_identity",
+            "validate_tax_separation",
+            "validate_ledger_sync",
+            "apply_approval_rules",
+            "record_proposed_credit",
+            "mark_ready_for_approval"
+          ]
+        },
+        {
+          "id": "requires_kyc",
+          "type": "step_presence",
+          "expect": "validate_identity"
+        },
+        {
+          "id": "requires_tax_docs",
+          "type": "step_presence",
+          "expect": "validate_tax_separation"
+        },
+        {
+          "id": "requires_ledger_sync",
+          "type": "step_presence",
+          "expect": "validate_ledger_sync"
+        }
+      ]
+    },
+    {
+      "workflow": "approve_loan",
+      "checks": [
+        {
+          "id": "requires_pending_approval",
+          "type": "step_presence",
+          "expect": "confirm_ledger_entry"
+        },
+        {
+          "id": "requires_owner_approval",
+          "type": "step_presence",
+          "expect": "owner_approval"
+        }
+      ]
+    },
+    {
+      "workflow": "disburse_funds",
+      "checks": [
+        {
+          "id": "requires_approved_status",
+          "type": "step_presence",
+          "expect": "confirm_loan_approved"
+        },
+        {
+          "id": "requires_tax_pre_disbursement",
+          "type": "step_presence",
+          "expect": "validate_tax_before_disbursement"
+        },
+        {
+          "id": "requires_owner_disbursement_approval",
+          "type": "step_presence",
+          "expect": "owner_disbursement_approval"
+        }
+      ]
+    },
+    {
+      "workflow": "sync_ledger",
+      "checks": [
+        {
+          "id": "requires_consistency_check",
+          "type": "step_presence",
+          "expect": "compare_authority_and_ledger"
+        }
+      ]
+    }
+  ]
+}
