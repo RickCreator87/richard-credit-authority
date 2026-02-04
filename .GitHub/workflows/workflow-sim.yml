@@ -1,0 +1,26 @@
+name: Workflow Simulation
+
+on:
+  pull_request:
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Simulate issue_credit
+        run: node scripts/run-workflow.js issue_credit
+
+      - name: Simulate approve_loan
+        run: node scripts/run-workflow.js approve_loan
+
+      - name: Simulate disburse_funds
+        run: node scripts/run-workflow.js disburse_funds
+
+      - name: Simulate sync_ledger
+        run: node scripts/run-workflow.js sync_ledger
