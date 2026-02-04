@@ -1,0 +1,69 @@
+{
+  "name": "approve_loan",
+  "version": "1.0.0",
+  "description": "Approve a loan only after KYC, tax, and ledger conditions are satisfied.",
+  "steps": [
+    {
+      "id": "check_emergency_stop",
+      "type": "governance_check",
+      "requires": [],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "emergency_stop"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "revalidate_identity",
+      "type": "kyc_check",
+      "requires": ["check_emergency_stop"],
+      "config": {
+        "owner_file": "../identity/owner.json",
+        "subject_identity_source": "kyc-service"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "revalidate_tax",
+      "type": "tax_check",
+      "requires": ["revalidate_identity"],
+      "config": {
+        "tax_rules_file": "../tax/tax-rules.json",
+        "require_separation": true
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "confirm_ledger_entry",
+      "type": "ledger_check",
+      "requires": ["revalidate_tax"],
+      "config": {
+        "source": "loaner-ledger",
+        "expected_entry_status": "pending_approval"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "owner_approval",
+      "type": "governance_check",
+      "requires": ["confirm_ledger_entry"],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "approval_thresholds.loan_issue",
+        "required_role": "owner"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "update_ledger_to_approved",
+      "type": "ledger_write",
+      "requires": ["owner_approval"],
+      "config": {
+        "target": "loaner-ledger",
+        "entry_type": "loan",
+        "status": "approved"
+      },
+      "on_fail": "abort"
+    }
+  ]
+}
