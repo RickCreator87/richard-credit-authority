@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "validate identity",
+      "expect": "owner.json exists and signature_hash is present"
+    },
+    {
+      "name": "validate tax separation",
+      "expect": "tax-rules.json.require_separation == true"
+    }
+  ]
+}
