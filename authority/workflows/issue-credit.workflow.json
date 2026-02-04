@@ -1,0 +1,77 @@
+{
+  "name": "issue_credit",
+  "version": "1.0.0",
+  "description": "Issue new credit under Richard's personal authority with strict tax-first and KYC enforcement.",
+  "steps": [
+    {
+      "id": "check_emergency_stop",
+      "type": "governance_check",
+      "requires": [],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "emergency_stop"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "validate_identity",
+      "type": "kyc_check",
+      "requires": ["check_emergency_stop"],
+      "config": {
+        "owner_file": "../identity/owner.json",
+        "subject_identity_source": "kyc-service"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "validate_tax_separation",
+      "type": "tax_check",
+      "requires": ["validate_identity"],
+      "config": {
+        "tax_rules_file": "../tax/tax-rules.json",
+        "require_separation": true
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "validate_ledger_sync",
+      "type": "ledger_check",
+      "requires": ["validate_tax_separation"],
+      "config": {
+        "expected_state": "in_sync",
+        "source": "loaner-ledger"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "apply_approval_rules",
+      "type": "governance_check",
+      "requires": ["validate_ledger_sync"],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "approval_thresholds.loan_issue",
+        "required_role": "owner"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "record_proposed_credit",
+      "type": "ledger_write",
+      "requires": ["apply_approval_rules"],
+      "config": {
+        "target": "loaner-ledger",
+        "entry_type": "proposed_credit"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "mark_ready_for_approval",
+      "type": "status_update",
+      "requires": ["record_proposed_credit"],
+      "config": {
+        "status": "pending_approval"
+      },
+      "on_fail": "abort"
+    }
+  ]
+}
