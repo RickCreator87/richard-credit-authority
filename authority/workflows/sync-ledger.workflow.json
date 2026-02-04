@@ -1,0 +1,45 @@
+{
+  "name": "sync_ledger",
+  "version": "1.0.0",
+  "description": "Ensure the authority view and loaner-ledger are in sync before any critical operation.",
+  "steps": [
+    {
+      "id": "check_emergency_stop",
+      "type": "governance_check",
+      "requires": [],
+      "config": {
+        "file": "../governance/governance-rules.json",
+        "field": "emergency_stop"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "pull_ledger_state",
+      "type": "ledger_read",
+      "requires": ["check_emergency_stop"],
+      "config": {
+        "source": "loaner-ledger"
+      },
+      "on_fail": "abort"
+    },
+    {
+      "id": "compare_authority_and_ledger",
+      "type": "consistency_check",
+      "requires": ["pull_ledger_state"],
+      "config": {
+        "authority_source": "../registry.json",
+        "ledger_source": "loaner-ledger"
+      },
+      "on_fail": "flag_out_of_sync"
+    },
+    {
+      "id": "mark_in_sync",
+      "type": "status_update",
+      "requires": ["compare_authority_and_ledger"],
+      "config": {
+        "status": "in_sync"
+      },
+      "on_fail": "abort"
+    }
+  ]
+}
