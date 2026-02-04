@@ -1,0 +1,37 @@
+{
+  "name": "workflow_integrity_suite",
+  "version": "1.0.0",
+  "tests": [
+    {
+      "id": "all_workflows_registered",
+      "type": "json_array_check",
+      "config": {
+        "file": "../authority/workflows/registry.json",
+        "field": "workflows"
+      },
+      "expect": [
+        "issue_credit.workflow.json",
+        "approve_loan.workflow.json",
+        "disburse_funds.workflow.json",
+        "sync_ledger.workflow.json"
+      ]
+    },
+    {
+      "id": "no_missing_files",
+      "type": "file_exists_for_each",
+      "config": {
+        "directory": "../authority/workflows/",
+        "files_from_registry": true
+      },
+      "expect": "all_exist"
+    },
+    {
+      "id": "no_circular_dependencies",
+      "type": "workflow_dependency_check",
+      "config": {
+        "directory": "../authority/workflows/"
+      },
+      "expect": "no_cycles"
+    }
+  ]
+}
