@@ -1,0 +1,20 @@
+{
+  "project_number": "627948569560",
+  "project_name": "richards-credit-authority",
+  "authority_version": "1.0.0",
+  "owner": {
+    "name": "Richard Duane Kindler",
+    "github": "RickCreator87"
+  },
+  "tax": {
+    "state": "Colorado",
+    "federal": "US",
+    "separation": true
+  },
+  "permissions": {
+    "can_issue_credit": true,
+    "can_approve_loans": true,
+    "can_modify_terms": true,
+    "can_disburse_funds": true
+  }
+}
