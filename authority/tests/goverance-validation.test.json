@@ -1,0 +1,33 @@
+{
+  "name": "governance_validation_suite",
+  "version": "1.0.0",
+  "tests": [
+    {
+      "id": "approval_thresholds_defined",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/governance/governance-rules.json",
+        "field": "approval_thresholds.loan_issue"
+      },
+      "expect": "owner"
+    },
+    {
+      "id": "milestones_defined",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/governance/governance-rules.json",
+        "field": "milestone_checks.require_kyc"
+      },
+      "expect": true
+    },
+    {
+      "id": "emergency_stop_has_triggers",
+      "type": "json_field_check",
+      "config": {
+        "file": "../authority/governance/governance-rules.json",
+        "field": "emergency_stop.trigger_conditions"
+      },
+      "expect": "not_empty"
+    }
+  ]
+}
