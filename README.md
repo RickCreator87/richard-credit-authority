@@ -145,3 +145,136 @@ loaner_profile:
 - Colorado does not tax municipal bond interest
 - Private loans are fully taxable
 ```
+
+
+Below is a Mermaid‑style diagram (text‑based, repo‑safe, Git‑friendly) that maps:
+
+- Governance tiers  
+- Emoji identities  
+- Badge identities  
+- Authority flows  
+- Escalation paths  
+- Financial permissions  
+
+It’s designed to drop directly into a README, wiki page, or /governance/diagram.md.
+
+---
+
+
+
+🏛️ BADGE‑MAPPED GOVERNANCE DIAGRAM
+
+(Mermaid mindmap with emojis + badge labels)
+
+`mermaid
+mindmap
+  root((🏛️ Governance System))
+
+    %% TIER 0
+    "🧑‍💼👑 Tier 0: Founder Authority  
+    [Badge: Tier0-Founder👑]" 
+      :::tier0
+      ("Full Credit Authority  
+      • Issue Instruments  
+      • Amend Schemas  
+      • Override Governance  
+      • Tax‑First Enforcement")
+      ("Financial Powers  
+      • Approve Loans  
+      • Approve Disbursements  
+      • Modify Interest Logic")
+      ("Repos  
+      • /governance/founders  
+      • /authority/personal-credit  
+      • /instruments/active")
+
+    %% TIER 1
+    "🏛️⚖️ Tier 1: Governance & Compliance  
+    [Badge: Tier1-Governance⚖️]" 
+      :::tier1
+      ("Compliance Oversight  
+      • Enforce Rules  
+      • Maintain Schemas  
+      • Approve Amendments")
+      ("Financial Permissions  
+      • Validate Instruments  
+      • Approve Draws  
+      • Approve Repayment Schedules")
+      ("Repos  
+      • /governance/compliance  
+      • /schema  
+      • /events/audit")
+
+    %% TIER 2
+    "🧩📊 Tier 2: Operations & Workflow  
+    [Badge: Tier2-Operations📊]" 
+      :::tier2
+      ("Automation  
+      • Maintain Workflow Engine  
+      • Run CI/CD  
+      • Ensure Determinism")
+      ("Financial Execution  
+      • Execute Approved Draws  
+      • Log Repayments  
+      • Trigger Interest Calculations")
+      ("Repos  
+      • /scripts  
+      • /events/draws  
+      • /events/repayments")
+
+    %% TIER 3
+    "🛠️📘 Tier 3: Contributor  
+    [Badge: Tier3-Contributor🛠️]" 
+      :::tier3
+      ("Permissions  
+      • Propose Amendments  
+      • Submit PRs  
+      • Update Docs")
+      ("Repos  
+      • /docs  
+      • /templates  
+      • /wiki")
+
+    %% TIER 4
+    "🌱📄 Tier 4: Community  
+    [Badge: Tier4-Community🌱]" 
+      :::tier4
+      ("Permissions  
+      • Submit Issues  
+      • Suggest Docs  
+      • Participate in Discussions")
+      ("Repos  
+      • /community  
+      • /issues")
+
+    %% TIER 5
+    "👀📁 Tier 5: Observer  
+    [Badge: Tier5-Observer👀]" 
+      :::tier5
+      ("Permissions  
+      • Read‑Only Access  
+      • Verify Commits  
+      • Review Audit Trails")
+      ("Repos  
+      • Entire Repo (Read‑Only)")
+`
+
+---
+
+🎨 Color‑Coding (Optional Mermaid Classes)
+If you want the diagram to render with color in GitHub‑friendly Mermaid:
+
+`mermaid
+classDef tier0 fill:#6a1b9a,stroke:#4a148c,color:#fff;
+classDef tier1 fill:#283593,stroke:#1a237e,color:#fff;
+classDef tier2 fill:#1565c0,stroke:#0d47a1,color:#fff;
+classDef tier3 fill:#00897b,stroke:#00695c,color:#fff;
+classDef tier4 fill:#7cb342,stroke:#558b2f,color:#fff;
+classDef tier5 fill:#546e7a,stroke:#37474f,color:#fff;
+`
+
+Drop this under the diagram and it will render with your governance palette.
+
+---
+
+
