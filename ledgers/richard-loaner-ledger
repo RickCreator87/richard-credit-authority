@@ -1,0 +1,26 @@
+ledger_metadata:
+  owner: "Richard Duane Kindler"
+  authority_ref: "richards-credit-authority"
+  last_updated: "2026-02-06"
+  currency: "USD"
+
+global_limits:
+  total_authorized_cap: 100000.00
+  single_loan_max: 50000.00
+
+active_loans:
+  - loan_id: "GD-PROD-2026-001"
+    borrower: "GitDigital Products LLC"
+    principal: 3000.00
+    interest_rate: 0.00
+    status: "ACTIVE"
+    effective_date: "2026-02-01"
+    
+  # Future applications will be added here
+  # - loan_id: "GD-PROD-2026-002"
+  #   principal: 0.00
+  #   status: "PENDING"
+
+summary_totals:
+  total_outstanding_principal: 3000.00
+  remaining_lending_capacity: 97000.00
