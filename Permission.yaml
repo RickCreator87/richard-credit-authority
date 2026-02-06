@@ -1,0 +1,354 @@
+🏛️ PERMISSIONS.yaml - Granular Authority Matrix
+
+```yaml
+# ============================================
+# RICHARD'S CREDIT AUTHORITY
+# Permission Matrix & Role-Based Access Control
+# ============================================
+
+metadata:
+  version: "1.0.0"
+  effectiveDate: "2026-11-01"
+  scope: "All credit authority operations"
+
+# ============ ROLES DEFINITION ============
+roles:
+  creditAuthority:
+    holder: "Richard D. Kindler"
+    permissions:
+      - "CREATE_LOAN"
+      - "APPROVE_LOAN_UNDER_100K"
+      - "APPROVE_LOAN_100K_TO_500K"
+      - "NEGOTIATE_TERMS"
+      - "SIGN_AGREEMENTS"
+      - "MANAGE_PORTFOLIO"
+      - "DECLARE_DEFAULT"
+      - "INITIATE_COLLECTION"
+      - "MODIFY_TERMS_WITH_CONSENT"
+      - "APPROVE_REFINANCE"
+      - "WAIVE_FEES"
+      - "GRANT_EXTENSIONS"
+      - "ACCESS_ALL_RECORDS"
+      - "APPROVE_PAYOUTS"
+      - "MANAGE_COLLATERAL"
+    limits:
+      maxSingleApproval: "$500,000"
+      maxPortfolioExposure: "$5,000,000"
+      requiresDualSignatureAbove: "$500,000"
+  
+  legalCounsel:
+    holder: "[Attorney Name]"
+    permissions:
+      - "REVIEW_LEGAL_DOCS"
+      - "APPROVE_LOAN_OVER_500K"
+      - "APPROVE_LEGAL_STRUCTURE"
+      - "ADVISE_ON_COMPLIANCE"
+      - "REVIEW_DISPUTES"
+      - "APPROVE_SETTLEMENTS"
+      - "REVIEW_COLLECTION_ACTIONS"
+      - "ADVISE_ON_REGULATORY"
+      - "APPROVE_AMENDMENTS"
+      - "REVIEW_SECURITY_DOCS"
+    limits:
+      cannot: "CREATE_LOAN"
+      cannot: "SIGN_WITHOUT_CREDIT_AUTHORITY"
+      advisoryOnlyBelow: "$100,000"
+  
+  taxAdvisor:
+    holder: "[Tax Advisor Name]"
+    permissions:
+      - "REVIEW_TAX_STRUCTURE"
+      - "APPROVE_TAX_TREATMENT"
+      - "ADVISE_ON_DEDUCTIONS"
+      - "REVIEW_REPORTING"
+      - "APPROVE_STATE_FILINGS"
+      - "ADVISE_ON_NEXUS"
+    limits:
+      readOnly: "FINANCIAL_RECORDS"
+      cannot: "APPROVE_TRANSACTIONS"
+      advisoryOnly: true
+  
+  operationsManager:
+    holder: "[To be named]"
+    permissions:
+      - "PROCESS_PAYMENTS"
+      - "GENERATE_REPORTS"
+      - "SEND_REMINDERS"
+      - "UPDATE_RECORDS"
+      - "PROCESS_APPLICATIONS"
+      - "VERIFY_DOCUMENTS"
+      - "COLLECT_INFORMATION"
+      - "SCHEDULE_MEETINGS"
+    limits:
+      cannot: "APPROVE_LOANS"
+      cannot: "MODIFY_TERMS"
+      paymentLimit: "$10,000"
+      readOnly: "SENSITIVE_INFORMATION"
+  
+  auditor:
+    holder: "[Auditor Name]"
+    permissions:
+      - "ACCESS_ALL_RECORDS"
+      - "REVIEW_TRANSACTIONS"
+      - "VALIDATE_COMPLIANCE"
+      - "GENERATE_AUDIT_REPORTS"
+      - "RECOMMEND_IMPROVEMENTS"
+    limits:
+      readOnly: true
+      cannot: "MODIFY_DATA"
+      cannot: "INITIATE_ACTIONS"
+      temporaryAccess: "AUDIT_PERIOD_ONLY"
+
+# ============ PERMISSION MATRIX ============
+permissionMatrix:
+  CREATE_LOAN:
+    description: "Initiate new loan transaction"
+    roles: ["creditAuthority"]
+    approvalRequired: "AUTO_IF_UNDER_25K"
+    documentation: "Loan application form"
+  
+  APPROVE_LOAN_UNDER_100K:
+    description: "Approve loans up to $100,000"
+    roles: ["creditAuthority"]
+    checks: ["AUTOMATED_VALIDATION", "CREDIT_CHECK"]
+    timeLimit: "48 hours"
+  
+  APPROVE_LOAN_100K_TO_500K:
+    description: "Approve loans $100K-$500K"
+    roles: ["creditAuthority"]
+    additionalChecks: ["LEGAL_REVIEW", "COLLATERAL_ASSESSMENT"]
+    timeLimit: "72 hours"
+  
+  APPROVE_LOAN_OVER_500K:
+    description: "Approve loans over $500,000"
+    roles: ["creditAuthority", "legalCounsel"]
+    required: "DUAL_SIGNATURE"
+    committeeReview: "REQUIRED"
+    timeLimit: "5 business days"
+  
+  NEGOTIATE_TERMS:
+    description: "Negotiate loan terms with borrower"
+    roles: ["creditAuthority"]
+    limits: "WITHIN_POLICY_PARAMETERS"
+    requiresDocumentation: "TERM_SHEET"
+  
+  SIGN_AGREEMENTS:
+    description: "Execute legal agreements"
+    roles: ["creditAuthority", "legalCounsel"]
+    conditions:
+      creditAuthority: "ALL_AGREEMENTS"
+      legalCounsel: "AGREEMENTS_OVER_500K"
+    method: "DIGITAL_OR_WET_SIGNATURE"
+  
+  DECLARE_DEFAULT:
+    description: "Declare loan in default"
+    roles: ["creditAuthority"]
+    conditions:
+      - "PAST_DUE_90_DAYS"
+      - "MATERIAL_BREACH"
+      - "INSOLVENCY"
+    noticeRequired: "30_DAYS"
+    documentation: "DEFAULT_NOTICE"
+  
+  INITIATE_COLLECTION:
+    description: "Begin collection actions"
+    roles: ["creditAuthority"]
+    escalationPath:
+      1: "DEMAND_LETTER"
+      2: "NEGOTIATION"
+      3: "LEGAL_ACTION"
+    limits: "COMPLIANCE_WITH_FDCPA"
+  
+  APPROVE_SETTLEMENTS:
+    description: "Approve settlement agreements"
+    roles: ["creditAuthority", "legalCounsel"]
+    required: "DUAL_SIGNATURE_OVER_50K"
+    documentation: "SETTLEMENT_AGREEMENT"
+  
+  WAIVE_FEES:
+    description: "Waive late fees or penalties"
+    roles: ["creditAuthority"]
+    limits:
+      oneTime: "UP_TO_500"
+      annual: "UP_TO_2000"
+    documentation: "FEE_WAIVER_FORM"
+  
+  GRANT_EXTENSIONS:
+    description: "Grant payment extensions"
+    roles: ["creditAuthority"]
+    limits:
+      maximumExtension: "90_DAYS"
+      perLoan: "TWICE_PER_YEAR"
+    documentation: "EXTENSION_AGREEMENT"
+  
+  MODIFY_TERMS_WITH_CONSENT:
+    description: "Modify terms with borrower consent"
+    roles: ["creditAuthority"]
+    required: "MUTUAL_AGREEMENT"
+    documentation: "AMENDMENT_AGREEMENT"
+  
+  APPROVE_REFINANCE:
+    description: "Approve loan refinancing"
+    roles: ["creditAuthority"]
+    conditions:
+      - "CURRENT_LOAN_PERFORMING"
+      - "IMPROVED_TERMS"
+      - "NO_MATERIAL_CHANGE_RISK"
+    documentation: "REFINANCE_AGREEMENT"
+
+# ============ FINANCIAL PERMISSIONS ============
+financialPermissions:
+  DISBURSE_FUNDS:
+    roles: ["creditAuthority", "operationsManager"]
+    limits:
+      creditAuthority: "NO_LIMIT"
+      operationsManager: "10,000"
+    controls: "DUAL_AUTHORIZATION_OVER_50K"
+    verification: "LOAN_DOCUMENTS_REQUIRED"
+  
+  RECEIVE_PAYMENTS:
+    roles: ["operationsManager"]
+    action: "POST_RECEIPTS"
+    reconciliation: "DAILY"
+    exceptionReporting: "MISSED_PAYMENTS"
+  
+  APPROVE_WITHDRAWALS:
+    description: "Withdraw funds from operating account"
+    roles: ["creditAuthority"]
+    notification: "OPERATIONS_MANAGER"
+    limits: "MAINTAIN_MINIMUM_RESERVE"
+  
+  INVEST_SURPLUS:
+    description: "Invest idle funds"
+    roles: ["creditAuthority"]
+    allowedInstruments:
+      - "TREASURY_BILLS"
+      - "MONEY_MARKET"
+      - "HIGH_YIELD_SAVINGS"
+    riskLimit: "PRESERVE_CAPITAL"
+    liquidityRequirement: "30_DAYS_NOTICE"
+
+# ============ SYSTEM PERMISSIONS ============
+systemPermissions:
+  ACCESS_CRM:
+    roles: ["creditAuthority", "operationsManager", "auditor"]
+    level:
+      creditAuthority: "FULL_ACCESS"
+      operationsManager: "LIMITED_ACCESS"
+      auditor: "READ_ONLY"
+  
+  ACCESS_ACCOUNTING:
+    roles: ["creditAuthority", "operationsManager", "taxAdvisor", "auditor"]
+    level:
+      creditAuthority: "FULL_ACCESS"
+      operationsManager: "DATA_ENTRY"
+      taxAdvisor: "READ_ONLY_TAX_DATA"
+      auditor: "READ_ONLY"
+  
+  ACCESS_DOCUMENT_REPOSITORY:
+    roles: ["all"]
+    level:
+      creditAuthority: "FULL_ACCESS"
+      legalCounsel: "FULL_ACCESS"
+      operationsManager: "UPLOAD_AND_VIEW"
+      taxAdvisor: "VIEW_TAX_DOCS"
+      auditor: "VIEW_ALL"
+  
+  CONFIGURE_SYSTEM:
+    roles: ["creditAuthority"]
+    requires: "TECHNICAL_SUPPORT_REVIEW"
+    changeControl: "DOCUMENT_ALL_CHANGES"
+
+# ============ DELEGATION RULES ============
+delegation:
+  allowed: true
+  conditions:
+    - "TEMPORARY_ABSENCE_ONLY"
+    - "MAXIMUM_30_DAYS"
+    - "WRITTEN_DELEGATION_REQUIRED"
+    - "LIMITED_TO_SPECIFIED_ACTIONS"
+  
+  cannotDelegate:
+    - "APPROVE_LOAN_OVER_500K"
+    - "DECLARE_DEFAULT"
+    - "INITIATE_LEGAL_ACTION"
+    - "MODIFY_GOVERNANCE"
+  
+  delegationForm: "templates/delegation-authority.md"
+  revocation: "IMMEDIATE_BY_PRIMARY"
+
+# ============ EMERGENCY PERMISSIONS ============
+emergencyPermissions:
+  triggers:
+    - "SYSTEM_FAILURE"
+    - "NATURAL_DISASTER"
+    - "HEALTH_EMERGENCY"
+    - "SECURITY_BREACH"
+  
+  activatedBy: "CREDIT_AUTHORITY"
+  duration: "7_DAYS_MAXIMUM"
+  extensions: "COMMITTEE_APPROVAL_REQUIRED"
+  
+  emergencyPowers:
+    - "TEMPORARY_SINGLE_SIGNATORY"
+    - "EXPEDITED_APPROVALS"
+    - "ALTERNATE_COMMUNICATION"
+    - "TEMPORARY_ACCESS_GRANTS"
+  
+  audit: "FULL_REVIEW_POST_EMERGENCY"
+
+# ============ PERMISSION REVIEW & AUDIT ============
+reviewCycle:
+  quarterly:
+    - "ROLE_VERIFICATION"
+    - "ACCESS_LOG_REVIEW"
+    - "PERMISSION_USAGE_ANALYSIS"
+  
+  annual:
+    - "FULL_PERMISSION_REVIEW"
+    - "ROLE_REDESIGN_IF_NEEDED"
+    - "COMPLIANCE_CHECK"
+  
+  adHoc:
+    trigger: "SECURITY_INCIDENT"
+    response: "IMMEDIATE_REVIEW"
+
+# ============ VIOLATION CONSEQUENCES ============
+violations:
+  unauthorizedAction:
+    severity: "HIGH"
+    response:
+      - "IMMEDIATE_REVOCATION"
+      - "SECURITY_REVIEW"
+      - "POTENTIAL_LEGAL_ACTION"
+  
+  exceedingLimits:
+    severity: "MEDIUM"
+    response:
+      - "WARNING"
+      - "RETRAINING"
+      - "TEMPORARY_RESTRICTION"
+  
+  proceduralError:
+    severity: "LOW"
+    response:
+      - "CORRECTIVE_ACTION"
+      - "PROCESS_REVIEW"
+      - "DOCUMENTATION_UPDATE"
+
+# ============ SIGNATURES ============
+signatures:
+  primary:
+    name: "Richard D. Kindler"
+    role: "Credit Authority"
+    action: "APPROVES_THIS_MATRIX"
+    date: "2026-11-01"
+  
+  legal:
+    name: "[Attorney Name]"
+    role: "Legal Counsel"
+    action: "REVIEWED_FOR_COMPLIANCE"
+    date: "2026-11-01"
+```
+
+
