@@ -1,0 +1,725 @@
+🏛️ AUTHORITY.yaml - Core Credit Authority Declaration
+
+```yaml
+# ============================================
+# RICHARD'S PERSONAL CREDIT AUTHORITY
+# Core Declaration & Constitutional Document
+# ============================================
+
+metadata:
+  version: "1.0.0"
+  effectiveDate: "2026-11-01"
+  lastUpdated: "2026-11-01"
+  status: "ACTIVE"
+  authorityId: "RCA-2026-001"
+  jurisdiction: "United States, Texas"
+
+# ============ DECLARATION SECTION ============
+declaration:
+  issuer: "Richard D. Kindler"
+  title: "Personal Credit Authority & Lending Capacity Holder"
+  purpose: |
+    This document establishes Richard D Kindler as a sovereign individual
+    with the legal capacity, authority, and intention to:
+    1. Issue credit instruments
+    2. Establish lending terms and conditions
+    3. Create binding financial agreements
+    4. Act as counterparty in credit transactions
+    5. Enforce credit agreements under applicable law
+  
+  legalBasis:
+    - "Uniform Commercial Code § 3-104"
+    - "Texas Finance Code § 341.001"
+    - "15 U.S.C. § 1601 (Truth in Lending Act)"
+    - "Common Law Contract Principles"
+  
+  attestation: |
+    I, Richard D. Kindler, being of sound mind and legal capacity,
+    hereby declare and affirm my authority to engage in credit transactions
+    as defined herein. This authority is personal, non-transferable, and
+    subject to the governance structures established in this repository.
+
+# ============ CREDIT PARAMETERS ============
+parameters:
+  maximumAggregateExposure: "$5,000,000.00"
+  maximumSingleExposure: "$1,000,000.00"
+  
+  allowedCurrency:
+    - "USD"
+    - "USDC"
+    - "USDT"
+  
+  termLimits:
+    shortTerm: "90 days"
+    mediumTerm: "1-3 years"
+    longTerm: "3-7 years"
+    maximumTerm: "10 years"
+  
+  interestRateRange:
+    minimum: "0.5%"
+    standard: "4.5% - 8.5%"
+    maximum: "12.0%"
+  
+  collateralRequirements:
+    requiredForAmountsOver: "$100,000.00"
+    allowedCollateralTypes:
+      - "Real Estate"
+      - "Marketable Securities"
+      - "Bank Guarantees"
+      - "Cryptocurrency (USDC/USDT only)"
+      - "Personal Guarantee"
+    minimumCollateralizationRatio: "125%"
+
+# ============ LENDING CAPACITY ============
+lendingCapacity:
+  tier1:  # Immediate capacity
+    amount: "$500,000.00"
+    source: "Liquid Assets"
+    availability: "Immediate"
+  
+  tier2:  # Capacity with notice
+    amount: "$1,500,000.00"
+    source: "Investment Portfolio"
+    availability: "30 days notice"
+  
+  tier3:  # Syndication capacity
+    amount: "$3,000,000.00"
+    source: "Network Syndication"
+    availability: "Subject to agreement"
+  
+  totalAvailable: "$5,000,000.00"
+
+# ============ CREDIT INSTRUMENTS ============
+instruments:
+  promissoryNote:
+    status: "AUTHORIZED"
+    template: "templates/promissory-note.md"
+    maximumAmount: "$1,000,000.00"
+  
+  lineOfCredit:
+    status: "AUTHORIZED"
+    template: "templates/line-of-credit.md"
+    maximumAmount: "$500,000.00"
+    drawPeriod: "12 months"
+  
+  creditAgreement:
+    status: "AUTHORIZED"
+    template: "templates/credit-agreement.md"
+    maximumAmount: "$2,000,000.00"
+  
+  securityAgreement:
+    status: "AUTHORIZED"
+    template: "templates/security-agreement.md"
+  
+  personalGuarantee:
+    status: "AUTHORIZED"
+    template: "templates/personal-guarantee.md"
+
+# ============ APPROVAL MATRIX ============
+approvalRequirements:
+  upTo_25k:
+    - "Automated validation"
+    - "Identity verification"
+  
+  25k_to_100k:
+    - "Automated validation"
+    - "Identity verification"
+    - "Credit check"
+    - "Single signatory (Richard)"
+  
+  100k_to_500k:
+    - "Automated validation"
+    - "Identity verification"
+    - "Credit check"
+    - "Collateral assessment"
+    - "Single signatory (Richard)"
+  
+  500k_to_1M:
+    - "Automated validation"
+    - "Identity verification"
+    - "Credit check"
+    - "Collateral assessment"
+    - "Legal review"
+    - "Dual signatory (Richard + Attorney)"
+  
+  over_1M:
+    - "Automated validation"
+    - "Identity verification"
+    - "Credit check"
+    - "Collateral assessment"
+    - "Legal review"
+    - "Risk committee approval"
+    - "Dual signatory (Richard + Attorney)"
+
+# ============ VALIDATION REQUIREMENTS ============
+validation:
+  identityVerification:
+    - "Government-issued ID"
+    - "Proof of address"
+    - "Tax identification"
+    - "KYC/AML clearance"
+  
+  creditAssessment:
+    - "Credit score (minimum 650)"
+    - "Debt-to-income ratio (maximum 45%)"
+    - "Income verification"
+    - "Employment verification"
+  
+  documentRequirements:
+    - "Signed application"
+    - "Disclosure acknowledgment"
+    - "Credit agreement"
+    - "Promissory note (if applicable)"
+    - "Security agreement (if applicable)"
+
+# ============ COMPLIANCE FRAMEWORK ============
+compliance:
+  regulatory:
+    - "Truth in Lending Act (TILA)"
+    - "Equal Credit Opportunity Act (ECOA)"
+    - "Fair Credit Reporting Act (FCRA)"
+    - "Bank Secrecy Act (BSA)"
+    - "USA PATRIOT Act"
+  
+  taxCompliance:
+    - "Form 1099-INT issuance"
+    - "State tax withholding (if applicable)"
+    - "Reporting to IRS"
+    - "Document retention (7 years)"
+  
+  auditRequirements:
+    - "Annual internal audit"
+    - "Quarterly compliance check"
+    - "Transaction sampling"
+    - "Document review"
+
+# ============ OPERATIONAL PARAMETERS ============
+operations:
+  paymentProcessing:
+    allowedMethods:
+      - "ACH"
+      - "Wire Transfer"
+      - "Check"
+      - "Cryptocurrency (USDC/USDT only)"
+    processingTime: "1-3 business days"
+    latePaymentGracePeriod: "5 days"
+  
+  communicationProtocol:
+    primary: "Signed email"
+    secondary: "Registered mail"
+    emergency: "Phone + follow-up email"
+  
+  recordKeeping:
+    retentionPeriod: "7 years minimum"
+    storage: "Encrypted cloud + physical backup"
+    accessControl: "Two-factor authentication required"
+
+# ============ RISK MANAGEMENT ============
+riskManagement:
+  concentrationLimits:
+    singleBorrowerMax: "20% of total capacity"
+    industrySectorMax: "30% of total capacity"
+    geographicMax: "50% of total capacity"
+  
+  monitoring:
+    - "Quarterly credit reviews"
+    - "Monthly portfolio analysis"
+    - "Real-time exposure tracking"
+    - "Collateral valuation updates"
+  
+  mitigation:
+    - "Collateral requirements"
+    - "Personal guarantees"
+    - "Credit enhancements"
+    - "Reserve fund (5% of portfolio)"
+
+# ============ GOVERNANCE ============
+governance:
+  amendmentProcess:
+    - "Proposal in GOVERNANCE.yaml"
+    - "7-day review period"
+    - "Dual-signature approval required"
+    - "Version control via git"
+  
+  disputeResolution:
+    primary: "Mediation (Texas jurisdiction)"
+    secondary: "Arbitration (AAA Rules)"
+    final: "Court jurisdiction (Travis County, TX)"
+  
+  succession:
+    primarySuccessor: "To be named"
+    secondarySuccessor: "Estate executor"
+    activationTrigger: "Incapacity or death"
+
+# ============ SIGNATORIES ============
+signatories:
+  primary:
+    name: "Richard D. Kindler"
+    role: "Credit Authority Holder"
+    signatureMethod: "Digital + Wet Ink"
+    effectiveDate: "2026-11-01"
+  
+  secondary:
+    name: "[Attorney Name]"
+    role: "Legal Counsel"
+    signatureRequiredFor: "Transactions > $500,000"
+  
+  witness:
+    name: "[Witness Name]"
+    role: "Independent Witness"
+    signatureRequiredFor: "All original documents"
+
+# ============ DIGITAL SIGNATURE ============
+digitalSignature:
+  method: "PGP/GPG"
+  keyId: "0xABC123DEF456"
+  fingerprint: "ABCD 1234 EF56 7890 1234 5678 90AB CDEF 1234"
+  expiration: "2025-11-01"
+  revocationCertificate: "stored/revocation.crt"
+
+# ============ AFFIRMATION ============
+affirmation: |
+  I, Richard D. Kindler, hereby affirm:
+  
+  1. I have read and understand this Authority Declaration
+  2. I accept all responsibilities herein
+  3. I will operate within these parameters
+  4. I will maintain compliance with all laws
+  5. I will act in good faith in all transactions
+  
+  This authority is exercised with full responsibility
+  and commitment to ethical lending practices.
+
+  Date: November 1, 2026
+  Signature: ______________________________
+  [Richard D. Kindler]
+```
+
+🏛️ GOVERNANCE.yaml - Tax-First Dual-Founder Governance
+
+```yaml
+# ============================================
+# RICHARD'S CREDIT AUTHORITY GOVERNANCE
+# Tax-First, Dual-Founder Framework
+# ============================================
+
+metadata:
+  version: "1.0.0"
+  effectiveDate: "2026-11-01"
+  governanceModel: "Tax-First Dual-Founder"
+  jurisdiction: "Texas, United States"
+
+# ============ FOUNDATIONAL PRINCIPLES ============
+principles:
+  taxFirst:
+    description: "All decisions must optimize for tax efficiency first"
+    rules:
+      - "Tax implications assessed before financial terms"
+      - "Structure follows tax efficiency"
+      - "Compliance precedes profitability"
+  
+  dualFounder:
+    description: "Critical decisions require dual approval"
+    founders:
+      - "Richard D. Kindler (Financial Authority)"
+      - "[Legal Counsel] (Legal Authority)"
+    approvalThreshold: "Unanimous for major decisions"
+  
+  sovereignty:
+    description: "Maintain personal sovereignty in all agreements"
+    rules:
+      - "No automatic renewals without explicit consent"
+      - "Right to amend terms with notice"
+      - "Final authority rests with Richard"
+
+# ============ GOVERNANCE STRUCTURE ============
+structure:
+  creditCommittee:
+    members:
+      - "Richardv D. Kindler (Chair)"
+      - "[Legal Counsel]"
+      - "[Tax Advisor] (Advisory)"
+    responsibilities:
+      - "Approve transactions > $500,000"
+      - "Set credit policies"
+      - "Review portfolio risk"
+    meetingFrequency: "Quarterly"
+  
+  riskCommittee:
+    members:
+      - "Richard D. Kindler"
+      - "[Risk Analyst] (Advisory)"
+    responsibilities:
+      - "Monitor concentration risk"
+      - "Review collateral adequacy"
+      - "Approve risk exceptions"
+    meetingFrequency: "Monthly"
+  
+  complianceOfficer:
+    name: "Richard D. Kindler"
+    responsibilities:
+      - "Ensure regulatory compliance"
+      - "File required reports"
+      - "Maintain documentation"
+
+# ============ DECISION-MAKING FRAMEWORK ============
+decisionMaking:
+  levels:
+    level1: # Operational
+      amount: "Up to $25,000"
+      approval: "Richard only"
+      documentation: "Standard checklist"
+    
+    level2: # Tactical
+      amount: "$25,001 - $100,000"
+      approval: "Richard + automated checks"
+      documentation: "Full credit file"
+    
+    level3: # Strategic
+      amount: "$100,001 - $500,000"
+      approval: "Richard + legal review"
+      documentation: "Full file + legal opinion"
+    
+    level4: # Major
+      amount: "$500,001 - $1,000,000"
+      approval: "Credit Committee"
+      documentation: "Committee minutes + full documentation"
+    
+    level5: # Extraordinary
+      amount: "Over $1,000,000"
+      approval: "Unanimous Credit Committee + external review"
+      documentation: "Comprehensive dossier"
+
+  emergencyDecisions:
+    trigger: "Imminent loss > $100,000"
+    approval: "Richard + at least one committee member"
+    ratification: "Required within 48 hours"
+
+# ============ TAX GOVERNANCE ============
+taxGovernance:
+  primaryRule: "Tax efficiency drives structure"
+  
+  incomeClassification:
+    interestIncome:
+      reporting: "Form 1099-INT"
+      timing: "Accrual method"
+      stateRequirements: "Texas requires reporting"
+    
+    principalRepayment:
+      reporting: "Not taxable"
+      documentation: "Amortization schedule"
+    
+    feeIncome:
+      reporting: "Form 1099-MISC"
+      timing: "When earned"
+  
+  deductionStrategy:
+    badDebtDeduction:
+      method: "Specific charge-off"
+      timing: "When deemed uncollectible"
+      documentation: "Written determination required"
+    
+    expenseDeductions:
+      allowed:
+        - "Legal fees"
+        - "Professional services"
+        - "Collection costs"
+        - "Technology expenses"
+      documentation: "Receipts + business purpose"
+  
+  stateTaxCompliance:
+    texas:
+      franchiseTax: "Not applicable (below threshold)"
+      marginTax: "Monitor if exceeds $1.23M revenue"
+      reporting: "Annual franchise tax report"
+    
+    nexusConsiderations:
+      - "No physical presence outside Texas"
+      - "Digital lending creates no nexus"
+      - "Monitor borrower locations"
+
+# ============ LEGAL GOVERNANCE ============
+legalGovernance:
+  documentStandards:
+    requiredClauses:
+      - "Governing law (Texas)"
+      - "Venue (Travis County)"
+      - "Severability"
+      - "Integration"
+      - "Amendment process"
+    
+    prohibitedClauses:
+      - "Confession of judgment"
+      - "Cross-collateralization (without limit)"
+      - "Drag-along rights"
+      - "Automatic renewal"
+  
+  disputeResolution:
+    escalationPath:
+      1: "Direct negotiation (30 days)"
+      2: "Mediation (AAA Commercial Rules)"
+      3: "Arbitration (Texas, single arbitrator)"
+      4: "Litigation (Travis County District Court)"
+    
+    costAllocation: "Prevailing party recovers reasonable fees"
+  
+  regulatoryCompliance:
+    federal:
+      - "Truth in Lending Act (Regulation Z)"
+      - "Equal Credit Opportunity Act (Regulation B)"
+      - "Fair Credit Reporting Act"
+      - "Bank Secrecy Act (if applicable)"
+    
+    state:
+      - "Texas Finance Code Chapter 342"
+      - "Texas Debt Collection Act"
+      - "Texas Deceptive Trade Practices Act"
+
+# ============ FINANCIAL GOVERNANCE ============
+financialGovernance:
+  capitalPreservation:
+    reserveRequirement: "5% of outstanding portfolio"
+    investmentPolicy: "Liquid, low-risk instruments only"
+    withdrawalRestrictions: "Maintain minimum reserve"
+  
+  distributionPolicy:
+    interestIncome: "Reinvest 50%, distribute 50%"
+    principalRepayments: "Recycle into new loans"
+    feeIncome: "Cover expenses first, then distribute"
+  
+  accountingStandards:
+    method: "Accrual basis"
+    software: "QuickBooks + custom tracking"
+    reconciliation: "Monthly"
+    audit: "Annual internal review"
+
+# ============ RISK GOVERNANCE ============
+riskGovernance:
+  creditRisk:
+    maximumSingleExposure: "$1,000,000"
+    maximumSectorExposure: "30% of portfolio"
+    concentrationLimits:
+      - "Real estate: 40% max"
+      - "Technology: 30% max"
+      - "Other: 15% max per sector"
+  
+  operationalRisk:
+    controls:
+      - "Dual control for payments > $10,000"
+      - "Monthly reconciliation"
+      - "Annual security audit"
+    insurance:
+      - "Cyber liability: $1,000,000"
+      - "Errors & omissions: $1,000,000"
+  
+  complianceRisk:
+    monitoring:
+      - "Quarterly regulatory update review"
+      - "Annual compliance audit"
+      - "Transaction testing"
+    reporting:
+      - "Suspicious Activity Reports (if triggered)"
+      - "Currency Transaction Reports (if applicable)"
+
+# ============ TECHNOLOGY GOVERNANCE ============
+technologyGovernance:
+  systemRequirements:
+    - "End-to-end encryption"
+    - "Audit trail for all actions"
+    - "Automated backup"
+    - "Disaster recovery plan"
+  
+  accessControl:
+    principle: "Least privilege"
+    multiFactor: "Required for all systems"
+    reviewFrequency: "Quarterly"
+  
+  dataManagement:
+    retention: "7 years minimum"
+    privacy: "GDPR/CCPA compliance for personal data"
+    destruction: "Secure deletion after retention"
+
+# ============ SUCCESSION GOVERNANCE ============
+succession:
+  triggerEvents:
+    - "Incapacity > 30 days"
+    - "Death"
+    - "Voluntary relinquishment"
+  
+  primarySuccessor:
+    name: "[To be named]"
+    authority: "Limited to administration"
+    duration: "Until estate settled"
+  
+  backupSuccessor:
+    name: "Estate Executor"
+    authority: "As specified in will"
+  
+  transitionProtocol:
+    - "Legal notice to all counterparties"
+    - "Freeze new transactions"
+    - "Continue servicing existing"
+    - "Orderly wind-down or transfer"
+
+# ============ AMENDMENT PROCESS ============
+amendmentProcess:
+  proposal:
+    - "Submit via pull request"
+    - "7-day review period"
+    - "Credit Committee discussion"
+  
+  approval:
+    standard: "Majority of Credit Committee"
+    fundamental: "Unanimous Credit Committee + legal review"
+  
+  implementation:
+    - "Update all documents"
+    - "Notify affected parties"
+    - "Maintain version history"
+  
+  grandfathering:
+    existingAgreements: "Not affected unless mutually agreed"
+    newTransactions: "Subject to new terms immediately"
+
+# ============ AUDIT & OVERSIGHT ============
+audit:
+  internal:
+    frequency: "Quarterly"
+    scope: "Transactions, compliance, systems"
+    reporter: "Compliance Officer"
+  
+  external:
+    frequency: "Annual"
+    scope: "Financial statements, compliance"
+    auditor: "Independent CPA firm"
+  
+  regulatory:
+    preparation: "Always audit-ready"
+    documentation: "7-year retention"
+    cooperation: "Full compliance required"
+
+# ============ SIGNATORIES ============
+signatories:
+  founder1:
+    name: "Richard D. Kindler"
+    role: "Financial Authority & Primary Founder"
+    signature: "_________________________"
+    date: "2026-11-01"
+  
+  founder2:
+    name: "[Legal Counsel Name]"
+    role: "Legal Authority & Secondary Founder"
+    signature: "_________________________"
+    date: "2026-11-01"
+  
+  witness:
+    name: "[Independent Witness]"
+    role: "Governance Witness"
+    signature: "_________________________"
+    date: "2026-11-01"
+```
+
+🏛️ PERMISSIONS.yaml - Granular Authority Matrix
+
+```yaml
+# ============================================
+# RICHARD'S CREDIT AUTHORITY
+# Permission Matrix & Role-Based Access Control
+# ============================================
+
+metadata:
+  version: "1.0.0"
+  effectiveDate: "2026-11-01"
+  scope: "All credit authority operations"
+
+# ============ ROLES DEFINITION ============
+roles:
+  creditAuthority:
+    holder: "Richard D. Kindler"
+    permissions:
+      - "CREATE_LOAN"
+      - "APPROVE_LOAN_UNDER_100K"
+      - "APPROVE_LOAN_100K_TO_500K"
+      - "NEGOTIATE_TERMS"
+      - "SIGN_AGREEMENTS"
+      - "MANAGE_PORTFOLIO"
+      - "DECLARE_DEFAULT"
+      - "INITIATE_COLLECTION"
+      - "MODIFY_TERMS_WITH_CONSENT"
+      - "APPROVE_REFINANCE"
+      - "WAIVE_FEES"
+      - "GRANT_EXTENSIONS"
+      - "ACCESS_ALL_RECORDS"
+      - "APPROVE_PAYOUTS"
+      - "MANAGE_COLLATERAL"
+    limits:
+      maxSingleApproval: "$500,000"
+      maxPortfolioExposure: "$5,000,000"
+      requiresDualSignatureAbove: "$500,000"
+  
+  legalCounsel:
+    holder: "[Attorney Name]"
+    permissions:
+      - "REVIEW_LEGAL_DOCS"
+      - "APPROVE_LOAN_OVER_500K"
+      - "APPROVE_LEGAL_STRUCTURE"
+      - "ADVISE_ON_COMPLIANCE"
+      - "REVIEW_DISPUTES"
+      - "APPROVE_SETTLEMENTS"
+      - "REVIEW_COLLECTION_ACTIONS"
+      - "ADVISE_ON_REGULATORY"
+      - "APPROVE_AMENDMENTS"
+      - "REVIEW_SECURITY_DOCS"
+    limits:
+      cannot: "CREATE_LOAN"
+      cannot: "SIGN_WITHOUT_CREDIT_AUTHORITY"
+      advisoryOnlyBelow: "$100,000"
+  
+  taxAdvisor:
+    holder: "[Tax Advisor Name]"
+    permissions:
+      - "REVIEW_TAX_STRUCTURE"
+      - "APPROVE_TAX_TREATMENT"
+      - "ADVISE_ON_DEDUCTIONS"
+      - "REVIEW_REPORTING"
+      - "APPROVE_STATE_FILINGS"
+      - "ADVISE_ON_NEXUS"
+    limits:
+      readOnly: "FINANCIAL_RECORDS"
+      cannot: "APPROVE_TRANSACTIONS"
+      advisoryOnly: true
+  
+  operationsManager:
+    holder: "[To be named]"
+    permissions:
+      - "PROCESS_PAYMENTS"
+      - "GENERATE_REPORTS"
+      - "SEND_REMINDERS"
+      - "UPDATE_RECORDS"
+      - "PROCESS_APPLICATIONS"
+      - "VERIFY_DOCUMENTS"
+      - "COLLECT_INFORMATION"
+      - "SCHEDULE_MEETINGS"
+    limits:
+      cannot: "APPROVE_LOANS"
+      cannot: "MODIFY_TERMS"
+      paymentLimit: "$10,000"
+      readOnly: "SENSITIVE_INFORMATION"
+  
+  auditor:
+    holder: "[Auditor Name]"
+    permissions:
+      - "ACCESS_ALL_RECORDS"
+      - "REVIEW_TRANSACTIONS"
+      - "VALIDATE_COMPLIANCE"
+      - "GENERATE_AUDIT_REPORTS"
+      - "RECOMMEND_IMPROVEMENTS"
+    limits:
+      readOnly: true
+      cannot: "MODIFY_DATA"
+      cannot: "INITIATE_ACTIONS"
+      temporaryAccess: "AUDIT_PERIOD_ONLY"
+
+# ============ PERMISSION MATRIX ============
+permissionMatrix:
+  CREAT
