@@ -1,0 +1,294 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Push events to matching v*, e.g., v1.0, v20.15.10
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: 'v1.0.0'
+      release_notes:
+        description: 'Release notes'
+        required: false
+        default: 'Automated release'
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Get version
+      id: get_version
+      run: |
+        # Get version from tag or input
+        if [ -n "${{ github.event.inputs.version }}" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        elif [ -n "${{ github.ref_name }}" ]; then
+          VERSION="${{ github.ref_name }}"
+        else
+          VERSION="v1.0.0"
+        fi
+        
+        # Clean version string
+        VERSION=${VERSION#v}
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+        
+        # Update package.json if it exists
+        if [ -f "package.json" ]; then
+          npm version ${VERSION} --no-git-tag-version
+          echo "Updated package.json to version ${VERSION}"
+        fi
+        
+        # Create VERSION file
+        echo "${VERSION}" > VERSION
+        echo "Created VERSION file"
+        
+    - name: Run full validation
+      id: validation
+      run: |
+        echo "🧪 Running full validation before release..."
+        
+        if ./scripts/ci-check.sh; then
+          echo "✅ All validations passed"
+          echo "validation_passed=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Validation failed"
+          echo "validation_passed=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Generate comprehensive reports
+      id: generate_reports
+      run: |
+        echo "📊 Generating release reports..."
+        
+        mkdir -p release-artifacts
+        
+        # Generate all reports
+        if node scripts/generate-report.js all; then
+          echo "✅ Reports generated"
+          
+          # Copy reports to release artifacts
+          cp -r reports/* release-artifacts/ 2>/dev/null || true
+        else
+          echo "⚠️  Report generation had issues"
+        fi
+        
+        # Create manifest
+        cat > release-artifacts/manifest.json << EOF
+        {
+          "release": {
+            "version": "${{ steps.get_version.outputs.version }}",
+            "date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}"
+          },
+          "validation": {
+            "status": "${{ steps.validation.outputs.validation_passed }}",
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          },
+          "files": {
+            "count": $(find . -type f -not -path "./.git/*" -not -path "./node_modules/*" | wc -l),
+            "size": $(du -sh . | cut -f1)
+          }
+        }
+        EOF
+        
+    - name: Create changelog
+      id: changelog
+      run: |
+        echo "📝 Creating changelog..."
+        
+        # Get commits since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        
+        if [ -n "$LAST_TAG" ]; then
+          echo "Previous tag: $LAST_TAG"
+          git log --pretty=format:"- %s (%h)" ${LAST_TAG}..HEAD > release-artifacts/changelog.md
+        else
+          echo "No previous tag found"
+          git log --pretty=format:"- %s (%h)" -10 > release-artifacts/changelog.md
+        fi
+        
+        # Add header
+        cat > release-artifacts/CHANGELOG.md << EOF
+        # Release ${{ steps.get_version.outputs.tag }}
+        
+        Released: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Commit: ${{ github.sha }}
+        
+        ## Changes
+        
+        $(cat release-artifacts/changelog.md)
+        
+        ## Validation Status
+        
+        - Authority Validation: ${{ steps.validation.outputs.validation_passed }}
+        - Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        
+        ## Files Included
+        
+        See manifest.json for complete file list.
+        EOF
+        
+    - name: Create archive
+      id: create_archive
+      run: |
+        echo "📦 Creating release archive..."
+        
+        # Create clean archive (exclude git and node_modules)
+        tar --exclude='./.git' \
+            --exclude='./node_modules' \
+            --exclude='./release-artifacts' \
+            -czf "richards-credit-authority-${{ steps.get_version.outputs.version }}.tar.gz" .
+            
+        # Move archive to artifacts
+        mv "richards-credit-authority-${{ steps.get_version.outputs.version }}.tar.gz" release-artifacts/
+        
+        echo "Archive size: $(du -h release-artifacts/*.tar.gz | cut -f1)"
+        
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.get_version.outputs.tag }}
+        name: Release ${{ steps.get_version.outputs.tag }}
+        body_path: release-artifacts/CHANGELOG.md
+        draft: false
+        prerelease: ${{ github.event.inputs.prerelease || false }}
+        files: |
+          release-artifacts/richards-credit-authority-${{ steps.get_version.outputs.version }}.tar.gz
+          release-artifacts/manifest.json
+          release-artifacts/CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload additional artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-${{ steps.get_version.outputs.version }}-artifacts
+        path: |
+          release-artifacts/
+          
+    - name: Update repository files
+      id: update_files
+      run: |
+        echo "🔄 Updating repository files..."
+        
+        # Update REPO-MANIFEST.yaml with new version
+        if [ -f "REPO-MANIFEST.yaml" ]; then
+          sed -i "s/version: \".*\"/version: \"${{ steps.get_version.outputs.version }}\"/" REPO-MANIFEST.yaml
+          sed -i "s/lastUpdated: \".*\"/lastUpdated: \"$(date +%Y-%m-%d)\"/" REPO-MANIFEST.yaml
+          echo "Updated REPO-MANIFEST.yaml"
+        fi
+        
+        # Update AUTHORITY.yaml version
+        if [ -f "AUTHORITY.yaml" ]; then
+          sed -i "s/version: \".*\"/version: \"${{ steps.get_version.outputs.version }}\"/" AUTHORITY.yaml
+          sed -i "s/lastUpdated: \".*\"/lastUpdated: \"$(date +%Y-%m-%d)\"/" AUTHORITY.yaml
+          echo "Updated AUTHORITY.yaml"
+        fi
+        
+        # Create release summary
+        cat > RELEASE_SUMMARY.md << EOF
+        # Release ${{ steps.get_version.outputs.tag }} Summary
+        
+        ## Release Information
+        - Version: ${{ steps.get_version.outputs.version }}
+        - Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        - Commit: ${{ github.sha }}
+        - Validation: ${{ steps.validation.outputs.validation_passed }}
+        
+        ## Changes
+        $(cat release-artifacts/changelog.md)
+        
+        ## Next Steps
+        1. Review the release artifacts
+        2. Update any external documentation
+        3. Notify stakeholders if needed
+        4. Begin using the new version
+        EOF
+        
+    - name: Post release summary
+      if: always()
+      run: |
+        echo "## Release ${{ steps.get_version.outputs.tag }} 🎉" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.validation.outputs.validation_passed }}" == "true" ]; then
+          echo "✅ **Validation**: All checks passed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Validation**: Failed - release aborted" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version**: ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "## Changes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        cat release-artifacts/changelog.md 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- [GitHub Release](${{ steps.create_release.outputs.html_url }})" >> $GITHUB_STEP_SUMMARY
+        echo "- [Download Archive](https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.tag }}/richards-credit-authority-${{ steps.get_version.outputs.version }}.tar.gz)" >> $GITHUB_STEP_SUMMARY
+        echo "- [Full Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Create release issue
+      if: success()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Release ${{ steps.get_version.outputs.tag }} - $(new Date().toISOString().split('T')[0])`,
+            body: `## Release ${{ steps.get_version.outputs.tag }}
+            
+            Successfully released version ${{ steps.get_version.outputs.version }}.
+            
+            **Validation Status**: ✅ Passed
+            **Release Date**: ${new Date().toISOString()}
+            **Commit**: ${context.sha}
+            
+            ### Next Steps
+            
+            1. Review the release artifacts
+            2. Update external documentation if needed
+            3. Begin using the new version
+            
+            ### Links
+            
+            - [GitHub Release](${{ steps.create_release.outputs.html_url }})
+            - [Workflow Run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            
+            ---
+            
+            *This issue was automatically created by the release workflow.*`,
+            labels: ['release', 'automated']
+          });
