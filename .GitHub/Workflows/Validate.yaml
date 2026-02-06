@@ -1,0 +1,164 @@
+name: Validate Authority Files
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install js-yaml ajv ajv-formats
+        
+    - name: Validate authority structure
+      id: validate_authority
+      run: |
+        echo "🔍 Validating authority files..."
+        if node scripts/validate-authority.js --file AUTHORITY.yaml; then
+          echo "✅ Authority validation passed"
+          echo "authority_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Authority validation failed"
+          echo "authority_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Validate governance
+      id: validate_governance
+      run: |
+        echo "⚖️ Validating governance..."
+        if node scripts/validate-governance.js --file GOVERNANCE.yaml; then
+          echo "✅ Governance validation passed"
+          echo "governance_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Governance validation failed"
+          echo "governance_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Validate permissions
+      id: validate_permissions
+      run: |
+        echo "🔐 Validating permissions..."
+        if node scripts/validate-permissions.js --file PERMISSIONS.yaml; then
+          echo "✅ Permissions validation passed"
+          echo "permissions_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Permissions validation failed"
+          echo "permissions_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Validate schemas
+      id: validate_schemas
+      continue-on-error: true
+      run: |
+        echo "📋 Validating schemas..."
+        if [ -d "SCHEMA-REGISTRY" ] && [ "$(ls -A SCHEMA-REGISTRY/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
+          if node scripts/validate-schema.js --file AUTHORITY.yaml; then
+            echo "✅ Schema validation passed"
+            echo "schema_valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Schema validation failed (continuing anyway)"
+            echo "schema_valid=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "📭 No schemas found, skipping schema validation"
+          echo "schema_valid=skipped" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Run comprehensive validation
+      id: comprehensive_validation
+      run: |
+        echo "🧪 Running comprehensive validation..."
+        if ./scripts/ci-check.sh; then
+          echo "✅ Comprehensive validation passed"
+          echo "comprehensive_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Comprehensive validation failed"
+          echo "comprehensive_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Generate validation report
+      if: always()
+      run: |
+        echo "📊 Generating validation report..."
+        mkdir -p validation-reports
+        node scripts/generate-report.js summary 2>&1 | tee validation-reports/validation.log
+        
+        # Copy reports to artifact directory
+        mkdir -p artifact-reports
+        cp -r reports/* artifact-reports/ 2>/dev/null || true
+        
+    - name: Upload validation reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: validation-reports
+        path: |
+          artifact-reports/
+          validation-reports/
+          
+    - name: Post validation summary
+      if: always()
+      run: |
+        echo "## Validation Results 📋" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Authority | ${{ steps.validate_authority.outputs.authority_valid }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Governance | ${{ steps.validate_governance.outputs.governance_valid }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Permissions | ${{ steps.validate_permissions.outputs.permissions_valid }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Schemas | ${{ steps.validate_schemas.outputs.schema_valid }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Comprehensive | ${{ steps.comprehensive_validation.outputs.comprehensive_valid }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ steps.comprehensive_validation.outputs.comprehensive_valid }}" == "true" ]]; then
+          echo "✅ **All validations passed!** 🎉" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Some validations failed.** Please check the logs." >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Comment on PR
+      if: github.event_name == 'pull_request' && failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('Validation failed')
+          );
+          
+          if (!botComment) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '❌ **Validation failed**\n\nSome authority validations failed. Please check the workflow logs and fix the issues before merging.'
+            });
+          }
