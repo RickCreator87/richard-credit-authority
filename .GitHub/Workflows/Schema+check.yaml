@@ -1,0 +1,283 @@
+name: Schema Validation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'SCHEMA-REGISTRY/**'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - 'scripts/validate-schema.js'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'SCHEMA-REGISTRY/**'
+      - '**/*.yaml'
+      - '**/*.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-schemas:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install js-yaml ajv ajv-formats
+        
+    - name: Check schema directory
+      id: check_schemas
+      run: |
+        echo "📁 Checking schema directory..."
+        if [ -d "SCHEMA-REGISTRY" ]; then
+          SCHEMA_COUNT=$(find SCHEMA-REGISTRY -name "*.json" | wc -l)
+          echo "Found $SCHEMA_COUNT schema files"
+          echo "schema_count=$SCHEMA_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ $SCHEMA_COUNT -gt 0 ]; then
+            echo "schema_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "schema_exists=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "Schema directory not found"
+          echo "schema_exists=false" >> $GITHUB_OUTPUT
+          echo "schema_count=0" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Validate schema syntax
+      if: steps.check_schemas.outputs.schema_exists == 'true'
+      id: validate_syntax
+      run: |
+        echo "🔍 Validating schema syntax..."
+        SCHEMA_FILES=$(find SCHEMA-REGISTRY -name "*.json")
+        FAILED_SCHEMAS=()
+        
+        for schema in $SCHEMA_FILES; do
+          echo "Validating $schema..."
+          if node -e "
+            try {
+              const schema = JSON.parse(require('fs').readFileSync('$schema', 'utf8'));
+              const Ajv = require('ajv');
+              const ajv = new Ajv();
+              ajv.compile(schema);
+              console.log('  ✅ Valid JSON schema');
+              process.exit(0);
+            } catch (error) {
+              console.log('  ❌ Invalid JSON schema:', error.message);
+              process.exit(1);
+            }
+          "; then
+            echo "  ✅ $schema has valid syntax"
+          else
+            echo "  ❌ $schema has invalid syntax"
+            FAILED_SCHEMAS+=("$schema")
+          fi
+        done
+        
+        if [ ${#FAILED_SCHEMAS[@]} -eq 0 ]; then
+          echo "schema_syntax_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "schema_syntax_valid=false" >> $GITHUB_OUTPUT
+          echo "Failed schemas: ${FAILED_SCHEMAS[@]}"
+          exit 1
+        fi
+        
+    - name: Validate files against schemas
+      if: steps.check_schemas.outputs.schema_exists == 'true' && steps.validate_syntax.outputs.schema_syntax_valid == 'true'
+      id: validate_files
+      run: |
+        echo "🧪 Validating files against schemas..."
+        
+        # Create mapping of files to schemas
+        declare -A FILE_SCHEMA_MAP=(
+          ["AUTHORITY.yaml"]="authority"
+          ["GOVERNANCE.yaml"]="governance"
+          ["PERMISSIONS.yaml"]="permissions"
+          ["RISK-PROFILE.yaml"]="risk-profile"
+          ["CREDIT-LIMITS.yaml"]="credit-limits"
+          ["VALIDATION-RULES.yaml"]="validation-rules"
+          ["TAX-PROFILE.yaml"]="tax-profile"
+        )
+        
+        FAILED_VALIDATIONS=()
+        
+        for file in "${!FILE_SCHEMA_MAP[@]}"; do
+          schema="${FILE_SCHEMA_MAP[$file]}"
+          
+          if [ -f "$file" ]; then
+            echo "Validating $file against $schema schema..."
+            
+            if node scripts/validate-schema.js --file "$file" 2>&1 | grep -q "passed schema validation"; then
+              echo "  ✅ $file validates against $schema schema"
+            else
+              echo "  ❌ $file fails validation against $schema schema"
+              FAILED_VALIDATIONS+=("$file")
+            fi
+          else
+            echo "⚠️  $file not found, skipping"
+          fi
+        done
+        
+        # Validate identity files
+        if [ -d "identity" ]; then
+          IDENTITY_FILES=$(find identity -name "*.yaml" -o -name "*.yml")
+          
+          for file in $IDENTITY_FILES; do
+            echo "Validating $file against identity schema..."
+            
+            if node scripts/validate-schema.js --file "$file" 2>&1 | grep -q "passed schema validation"; then
+              echo "  ✅ $file validates against identity schema"
+            else
+              echo "  ❌ $file fails validation against identity schema"
+              FAILED_VALIDATIONS+=("$file")
+            fi
+          done
+        fi
+        
+        if [ ${#FAILED_VALIDATIONS[@]} -eq 0 ]; then
+          echo "file_validation_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "file_validation_valid=false" >> $GITHUB_OUTPUT
+          echo "Failed validations: ${FAILED_VALIDATIONS[@]}"
+          exit 1
+        fi
+        
+    - name: Generate missing schemas
+      if: steps.check_schemas.outputs.schema_exists == 'false' || steps.check_schemas.outputs.schema_count == '0'
+      id: generate_schemas
+      continue-on-error: true
+      run: |
+        echo "🛠️  Generating missing schemas..."
+        
+        CORE_FILES=(
+          "AUTHORITY.yaml"
+          "GOVERNANCE.yaml"
+          "PERMISSIONS.yaml"
+          "RISK-PROFILE.yaml"
+          "identity/profile.yaml"
+        )
+        
+        for file in "${CORE_FILES[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Generating schema for $file..."
+            if node scripts/validate-schema.js --generate "$file"; then
+              echo "  ✅ Generated schema for $file"
+            else
+              echo "  ❌ Failed to generate schema for $file"
+            fi
+          fi
+        done
+        
+    - name: Run full schema validation
+      if: steps.check_schemas.outputs.schema_exists == 'true'
+      id: full_validation
+      run: |
+        echo "🔬 Running full schema validation..."
+        if node scripts/validate-schema.js --all; then
+          echo "✅ Full schema validation passed"
+          echo "full_validation_valid=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Full schema validation failed"
+          echo "full_validation_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Create schema coverage report
+      if: always()
+      run: |
+        echo "📊 Creating schema coverage report..."
+        
+        # Count total YAML files
+        TOTAL_YAML=$(find . -name "*.yaml" -o -name "*.yml" | grep -v node_modules | wc -l)
+        
+        # Count files with schemas
+        if [ -d "SCHEMA-REGISTRY" ]; then
+          SCHEMA_COUNT=$(find SCHEMA-REGISTRY -name "*.json" | wc -l)
+        else
+          SCHEMA_COUNT=0
+        fi
+        
+        # Create report
+        mkdir -p schema-reports
+        cat > schema-reports/coverage.md << EOF
+        # Schema Coverage Report
+        
+        Generated: $(date)
+        
+        ## Summary
+        - Total YAML files: $TOTAL_YAML
+        - Schema files: $SCHEMA_COUNT
+        - Coverage: $((SCHEMA_COUNT * 100 / (TOTAL_YAML > 0 ? TOTAL_YAML : 1)))%
+        
+        ## Schema Status
+        | Schema | Status | Files Covered |
+        |--------|--------|---------------|
+        EOF
+        
+        # Add schema details
+        if [ -d "SCHEMA-REGISTRY" ]; then
+          for schema in SCHEMA-REGISTRY/*.json; do
+            if [ -f "$schema" ]; then
+              schema_name=$(basename "$schema" .schema.json)
+              echo "| $schema_name | ✅ | TODO |" >> schema-reports/coverage.md
+            fi
+          done
+        fi
+        
+        echo "## Recommendations" >> schema-reports/coverage.md
+        echo "1. Ensure all YAML files have corresponding schemas" >> schema-reports/coverage.md
+        echo "2. Regularly update schemas when file structures change" >> schema-reports/coverage.md
+        echo "3. Run schema validation in CI/CD pipeline" >> schema-reports/coverage.md
+        
+    - name: Upload schema reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: schema-reports
+        path: |
+          schema-reports/
+          SCHEMA-REGISTRY/
+          
+    - name: Post schema validation summary
+      if: always()
+      run: |
+        echo "## Schema Validation Results 📋" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.check_schemas.outputs.schema_exists }}" == "true" ]; then
+          echo "**Schema Files:** ${{ steps.check_schemas.outputs.schema_count }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.validate_syntax.outputs.schema_syntax_valid }}" == "true" ]; then
+            echo "✅ Schema syntax: Valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Schema syntax: Invalid" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.file_validation.outputs.file_validation_valid }}" == "true" ]; then
+            echo "✅ File validation: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ File validation: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.full_validation.outputs.full_validation_valid }}" == "true" ]; then
+            echo "✅ Full validation: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Full validation: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "⚠️  No schemas found" >> $GITHUB_STEP_SUMMARY
+          echo "Generated basic schemas for core files" >> $GITHUB_STEP_SUMMARY
+        fi.
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📁 Reports available in artifacts" >> $GITHUB_STEP_SUMMARY
