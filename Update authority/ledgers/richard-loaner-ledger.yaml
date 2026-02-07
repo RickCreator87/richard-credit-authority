@@ -1,0 +1,11 @@
+  - loan_id: "GD-PROD-2026-002"
+    borrower: "GitDigital Products LLC"
+    principal: [ENTER AMOUNT]
+    status: "EXECUTED"
+    governance_artifacts:
+      board_resolution_id: "2026-RES-001"
+      docusign_envelope_id: "PROMPT_USER_FOR_ID"
+      document_sha256: "PASTE_YOUR_HASH_HERE"
+    verification:
+      method: "In-Person Executive Session"
+      attestation: "Signatures verified by Richard Kindler (Tier 0)"
