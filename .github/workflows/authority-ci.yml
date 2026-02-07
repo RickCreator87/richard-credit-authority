@@ -1,4 +1,6 @@
 name: Authority Validation
+permissions:
+  contents: read
 
 on:
   push:
