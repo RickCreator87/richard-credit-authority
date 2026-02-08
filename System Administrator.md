@@ -1,0 +1,10 @@
+System Administrator
+
+```yaml
+permissions:
+  - perm_system_config
+  - perm_user_management
+  - perm_role_management
+  - perm_audit_access
+  - perm_export_audit
+```
