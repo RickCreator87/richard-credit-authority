@@ -17,6 +17,7 @@ type: object
 required:
   - authority_id
   - identity_reference
+  - type
   - granted_at
   - status
   - permissions
