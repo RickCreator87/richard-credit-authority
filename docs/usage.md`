@@ -1,0 +1,72 @@
+
+
+### `docs/usage.md`
+
+```markdown
+# Richard's Credit Authority - Usage Guide
+
+## Table of Contents
+
+1. [Quick Start](#quick-start)
+2. [Identity Management](#identity-management)
+3. [Authority Management](#authority-management)
+4. [Tax Calculations](#tax-calculations)
+5. [Governance Rules](#governance-rules)
+6. [API Usage](#api-usage)
+7. [Command Line Interface](#command-line-interface)
+8. [Troubleshooting](#troubleshooting)
+
+## Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/RickCreator87/richards-credit-authority.git
+cd richards-credit-authority
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+Basic Operations
+
+1. Create and Validate an Identity
+
+```bash
+# Create an identity file
+cp templates/identity-example.yaml my-identity.yaml
+# Edit my-identity.yaml with your information
+
+# Validate the identity
+python cli.py validate my-identity.yaml
+```
+
+2. Process Identity into Authority
+
+```bash
+# Create authority from identity
+python cli.py process --type individual my-identity.yaml
+
+# View the generated authority
+cat authorities/auth_*.yaml
+```
+
+3. Validate an Authority Request
+
+```bash
+# Create an authority request
+cp templates/authority-example.yaml my-authority.yaml
+# Edit my-authority.yaml
+
+# Validate against identity
+python cli.py validate my-authority.yaml --identity my-identity.yaml
+```
